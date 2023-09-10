@@ -2,13 +2,11 @@ import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>
+    <>
+        <p className="text-3xl text-green-800 ">
           Hello
         </p>
-      </header>
-    </div>
+    </>
   );
 }
 

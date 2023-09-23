@@ -1,28 +1,74 @@
 import React, { useEffect, useRef, useState } from "react";
 import Header from "./Header";
 import { checkValidData } from "../utils/validate";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { auth } from "../utils/firebase";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+  const navigate = useNavigate();
   const [isSignInForm, setSignInForm] = useState(true);
   const [errorMessage, setErrorMessage] = useState(true);
 
-  const toggleSignInForm = () => {
-    setSignInForm(!isSignInForm);
-  };
-
-  const name = useRef(null);
+  // const name = useRef(null);
   const email = useRef(null);
   const password = useRef(null);
 
   const handleButtonClick = () => {
     //validation
     const message = checkValidData(
-      name.current.value,
+      // name.current.value,
       email.current.value,
       password.current.value
     );
     setErrorMessage(message);
-    //sign and sign up
+    if (message) return;
+
+    if (!isSignInForm) {
+      //sign up logic
+      createUserWithEmailAndPassword(
+        auth,
+        // name.current.value,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          const user = userCredential.user;
+          console.log(user);
+          navigate("/browse");
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMessage(errorCode + "-" + errorMessage);
+        });
+    } else {
+      //signin logic
+      console.log("123");
+      signInWithEmailAndPassword(
+        auth,
+        // name.current.value,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          const user = userCredential.user;
+          console.log(user);
+          navigate("/browse");
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMessage(errorCode + "-" + errorMessage);
+        });
+    }
+  };
+
+  const toggleSignInForm = () => {
+    setSignInForm(!isSignInForm);
   };
 
   return (
@@ -45,7 +91,7 @@ export default function Login() {
 
         {!isSignInForm && (
           <input
-            ref={name}
+            // ref={name}
             type="name"
             placeholder="Enter Your name"
             className="p-2 m-2 w-full bg-gray-700"
@@ -64,6 +110,7 @@ export default function Login() {
           type="password"
           placeholder="Enter Your Password"
           className=" p-2 m-2 w-full bg-gray-700"
+          autocomplete="current-password"
         />
         <p className="text-red-500 font-bold text-lg py-2 ml-3">
           {errorMessage}

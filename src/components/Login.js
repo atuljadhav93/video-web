@@ -10,7 +10,7 @@ import { useDispatch } from "react-redux";
 import { USER_AVATAR } from "../constants/Constant";
 import { BG_URL } from "../constants/Constant";
 import { auth } from "../constants/firebase";
-import { addUser } from "../utlis/UserSlice";
+import { addUser } from "../slice/UserSlice";
 
 const Login = () => {
   const [signIn, SetSignIn] = useState(true);

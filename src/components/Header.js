@@ -3,10 +3,10 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../constants/firebase";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { addUser, removeUser } from "../utlis/UserSlice";
-import { toggleGptSearchView, addGptMovieResult } from "../utlis/GPTSlice";
+import { addUser, removeUser } from "../slice/UserSlice";
+import { toggleGptSearchView, addGptMovieResult } from "../slice/GPTSlice";
 import { FiLogOut ,FiSearch } from "react-icons/fi";
-import { changeLanguage } from "../utlis/ConfigSlice";
+import { changeLanguage } from "../slice/ConfigSlice";
 import { LOGO, SUPPORTED_LANG, USER_AVATAR } from "../constants/Constant";
 
 const Header = () => {

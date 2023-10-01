@@ -1,44 +1,66 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import Header from "./Header";
-import { checkValidData } from "../utils/validate";
+import { checkValidData, validateName } from "../constants/Validate";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  updateProfile
 } from "firebase/auth";
-import { auth } from "../utils/firebase";
-import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { USER_AVATAR } from "../constants/Constant";
+import { BG_URL } from "../constants/Constant";
+import { auth } from "../constants/firebase";
+import { addUser } from "../utlis/UserSlice";
 
-export default function Login() {
-  const navigate = useNavigate();
-  const [isSignInForm, setSignInForm] = useState(true);
-  const [errorMessage, setErrorMessage] = useState(true);
+const Login = () => {
+  const [signIn, SetSignIn] = useState(true);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const dispatch = useDispatch();
+  const fname = useRef(null);
+  const Email = useRef(null);
+  const Password = useRef(null);
 
-  // const name = useRef(null);
-  const email = useRef(null);
-  const password = useRef(null);
+  const signInTogler = () => {
+    SetSignIn(!signIn);
+  };
 
-  const handleButtonClick = () => {
-    //validation
-    const message = checkValidData(
-      // name.current.value,
-      email.current.value,
-      password.current.value
-    );
+  const validateData = () => {
+    const message = checkValidData(Email.current.value, Password.current.value);
     setErrorMessage(message);
+
     if (message) return;
 
-    if (!isSignInForm) {
-      //sign up logic
+    if (!signIn) {
+      const nameValue = fname.current.value;
+      const nameValidationMessage = validateName(nameValue);
+      setErrorMessage(nameValidationMessage);
+
       createUserWithEmailAndPassword(
         auth,
-        // name.current.value,
-        email.current.value,
-        password.current.value
+        Email.current.value,
+        Password.current.value
       )
         .then((userCredential) => {
           const user = userCredential.user;
-          console.log(user);
-          navigate("/browse");
+          
+          updateProfile(user, {
+            displayName: fname.current.value,
+            photoURL: USER_AVATAR,
+          })
+          .then(() => {
+            const { uid, email, displayName, photoURL } = auth.currentUser;
+            dispatch(
+              addUser({
+                uid: uid,
+                email: email,
+                displayName: displayName,
+                photoURL: photoURL,
+              })
+            );
+          })
+          .catch((error) => {
+            setErrorMessage(error.message);
+          });
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -46,18 +68,14 @@ export default function Login() {
           setErrorMessage(errorCode + "-" + errorMessage);
         });
     } else {
-      //signin logic
-      console.log("123");
       signInWithEmailAndPassword(
         auth,
-        // name.current.value,
-        email.current.value,
-        password.current.value
+        Email.current.value,
+        Password.current.value
       )
         .then((userCredential) => {
-          const user = userCredential.user;
-          console.log(user);
-          navigate("/browse");
+          // eslint-disable-next-line
+          const user = userCredential.user;  
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -67,31 +85,27 @@ export default function Login() {
     }
   };
 
-  const toggleSignInForm = () => {
-    setSignInForm(!isSignInForm);
-  };
-
   return (
-    <>
+    <div>
       <Header />
-      <div className="fixed z-1 opacity-9">
+      <div>
         <img
-          className="h-fit"
-          src="https://assets.nflxext.com/ffe/siteui/vlv3/dc1cf82d-97c9-409f-b7c8-6ac1718946d6/14a8fe85-b6f4-4c06-8eaf-eccf3276d557/IN-en-20230911-popsignuptwoweeks-perspective_alpha_website_large.jpg"
-          alt="video-web"
+        className=" fixed h-screen md:h-auto object-cover "
+          src={BG_URL}
+          alt="bg-img"
         />
       </div>
       <form
-        className=" fixed p-12 bg-gray-900 opacity-80 w-full md:w-3/12 my-32 mx-auto left-0 right-0 text-white"
+        className="fixed p-12 bg-gray-900 opacity-80 w-full md:w-3/12 my-32 mx-auto left-0 right-0 text-white"
         onSubmit={(e) => e.preventDefault()}
       >
         <h2 className=" p-2 my-2 font-bold text-3xl">
-          {isSignInForm ? "Sign In" : "Sign Up"}
+          {signIn ? "Sign In" : "Sign Up"}
         </h2>
 
-        {!isSignInForm && (
+        {!signIn && (
           <input
-            // ref={name}
+            ref={fname}
             type="name"
             placeholder="Enter Your name"
             className="p-2 m-2 w-full bg-gray-700"
@@ -99,18 +113,17 @@ export default function Login() {
         )}
 
         <input
-          ref={email}
+          ref={Email}
           type="email"
           placeholder="Enter Your Email"
           className="p-2 m-2 w-full bg-gray-700"
         />
 
         <input
-          ref={password}
+          ref={Password}
           type="password"
           placeholder="Enter Your Password"
           className=" p-2 m-2 w-full bg-gray-700"
-          autocomplete="current-password"
         />
         <p className="text-red-500 font-bold text-lg py-2 ml-3">
           {errorMessage}
@@ -118,16 +131,16 @@ export default function Login() {
 
         <button
           className="w-full bg-[#c11119] p-2 my-4 rounded-lg"
-          onClick={handleButtonClick}
+          onClick={validateData}
         >
-          {isSignInForm ? "Sign In" : "Sign Up"}
+          {signIn ? "Sign In" : "Sign Up"}
         </button>
-        <p className="ml-3 py-2 cursor-pointer" onClick={toggleSignInForm}>
-          {isSignInForm
-            ? "New User? Sign Up Now"
-            : "Already Registered? Sign In Now"}
+        <p className="ml-3 py-2 cursor-pointer" onClick={signInTogler}>
+          {signIn ? "New User? SignUp now" : "Existing user? Sign In"}
         </p>
       </form>
-    </>
+    </div>
   );
-}
+};
+
+export default Login;

@@ -1,5 +1,5 @@
 export const USER_AVATAR =
-  "https://lh3.googleusercontent.com/-87RTGHjpzcw/AAAAAAAAAAI/AAAAAAAAAAA/AJIwbgb1CdjAldTkNFdbK-XutL1yrkc6rg/photo.jpg?sz=46";
+  "https://img.freepik.com/premium-vector/man-character_665280-46967.jpg?w=740";
 export const LOGO =
   "https://cdn.cookielaw.org/logos/dd6b162f-1a32-456a-9cfe-897231c7763c/4345ea78-053c-46d2-b11e-09adaef973dc/Netflix_Logo_PMS.png";
 

@@ -19,7 +19,7 @@ export const BG_URL =
 
 export const SUPPORTED_LANG = [
   { identifier: "en", name: "English" },
-  { identifier: "Hindi", name: "Hindi" },
+  { identifier: "Hindi", name: "Hindi" }
 ];
 
 export const OPEN_AI = "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"
